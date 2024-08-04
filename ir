@@ -1,0 +1,22 @@
+#include "esphome.h"
+#include <RadioLib.h>
+
+class RadioLibComponent : public esphome::Component {
+ public:
+  Module* module;
+  RF24* radio;
+
+  void setup_nrf24l01(int csn, int ce) {
+    module = new Module(csn, ce, 14, 13, 12); // SCK, MOSI, MISO
+    radio = new RF24(module);
+    radio->begin();
+  }
+
+  void loop() override {
+    if (radio->available()) {
+      char text[32] = "";
+      radio->read(&text, sizeof(text));
+      ESP_LOGD("custom", "Received: %s", text);
+    }
+  }
+};
